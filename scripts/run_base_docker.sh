@@ -22,7 +22,8 @@ else
 fi
 
 # Determine configured user for the docker image
-docker_user=$(docker image inspect --format '{{.Config.User}}' $IMAGE_NAME)
+# docker_user=$(docker image inspect --format '{{.Config.User}}' $IMAGE_NAME)
+docker_user=$(id -un)
 if [ "$docker_user" = "" ]; then
     dHOME_FOLDER="/root"
 else
@@ -40,6 +41,10 @@ $(echo $docker_run_cmd) \
   -v $HOME/.Xauthority:$dHOME_FOLDER/.Xauthority \
   -e XAUTHORITY=$dHOME_FOLDER/.Xauthority \
   -e DISPLAY=$DISPLAY \
+  -e DOCKER_USER_NAME=$(id -un) \
+  -e DOCKER_USER_ID=$(id -u) \
+  -e DOCKER_USER_GROUP_NAME=$(id -gn) \
+  -e DOCKER_USER_GROUP_ID=a$(id -g) \
   -e TERMINAL=terminator \
   -v $HOME/Projects/devs/simulation/gazebo/utils/models_online_db:$dHOME_FOLDER/.gazebo/models \
   -it $IMAGE_NAME "$@"
